@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7-зертханалық жұмыс · Абстрактілі класс және интерфейс</title>
+<style>
+:root{--bg:#fff;--fg:#1c2330;--mut:#5b6575;--card:#f4f6fa;--acc:#2456c5;--bd:#d9dfe8;--code:#f1f3f7}
+@media(prefers-color-scheme:dark){:root{--bg:#12151b;--fg:#e6e9ef;--mut:#9aa4b2;--card:#1b2029;--acc:#7aa2ff;--bd:#2c3340;--code:#0e1116}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+header{padding:48px 20px 32px;background:var(--card);border-bottom:1px solid var(--bd);text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(24px,4vw,36px)}
+header p{margin:4px 0;color:var(--mut)}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--bd);display:flex;gap:4px;overflow-x:auto;padding:8px 16px;z-index:5}
+nav a{padding:6px 12px;border-radius:8px;color:var(--fg);text-decoration:none;white-space:nowrap;font-size:14px}
+nav a:hover{background:var(--card);color:var(--acc)}
+main{max-width:900px;margin:0 auto;padding:8px 20px 64px}
+section{padding-top:28px}
+h2{border-left:4px solid var(--acc);padding-left:12px;font-size:22px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin:12px 0}
+pre{background:var(--code);border:1px solid var(--bd);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.5 ui-monospace,Consolas,monospace;max-height:520px}
+img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--bd);background:#fff}
+button,input,select{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
+button{background:var(--acc);color:#fff;border:0;cursor:pointer}
+button.alt{background:var(--card);color:var(--fg);border:1px solid var(--bd)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+#log{min-height:120px;white-space:pre-wrap;font:14px/1.5 ui-monospace,Consolas,monospace}
+.ok{color:#1a8f4c;font-weight:600}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--bd);padding:8px;text-align:left}
+details{margin:10px 0}summary{cursor:pointer;font-weight:600}
+a{color:var(--acc)}
+footer{text-align:center;color:var(--mut);padding:24px;border-top:1px solid var(--bd);font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>7-зертханалық жұмыс</h1>
+<p>Пәні: Білім берудегі объектілі-бағдарлы программалау</p>
+<p>Тақырыбы: Абстрактілі класс және интерфейс</p>
+<p><b>1-тапсырма.</b> Интеллектуалды білім беру платформасын жобалау</p>
+</header>
+<nav><a href="#goal">Мақсат</a><a href="#req">Талаптар</a><a href="#uml">UML</a><a href="#demo">Демо</a><a href="#code">Код</a><a href="#tests">Тест</a><a href="#qa">Сұрақтар</a></nav>
+<main>
+
+<section id="goal"><h2>Мақсаты</h2>
+<p>Абстрактілі класс пен интерфейстерді қолданып, жоғары оқу орнына арналған білім беру платформасының объектілік моделін әзірлеу; мұрагерлік пен полиморфизмді практикада қолдану.</p>
+<div class="card">Платформада <b>Student</b>, <b>Teacher</b>, <b>Administrator</b> пайдаланушылары бар. Ортақ қасиеттері <b>User</b> абстрактілі класында, ал кіру, басқару, хабарландыру мүмкіндіктері интерфейстерде сипатталады.</div></section>
+
+<section id="req"><h2>Талаптарға сәйкестік</h2>
+<table>
+<tr><th>Талап</th><th>Орындалуы</th></tr>
+<tr><td>Кемінде 1 абстрактілі класс</td><td>User</td></tr>
+<tr><td>Кемінде 3 интерфейс</td><td>IAuthenticatable, IManageable, INotifiable</td></tr>
+<tr><td>Кемінде 5 класс</td><td>Student, Teacher, Administrator, Researcher, Guest</td></tr>
+<tr><td>Полиморфизм</td><td>Тізімдегі әр User үшін <code>perform_action()</code></td></tr>
+<tr><td>UML диаграммасы</td><td>төменде</td></tr>
+<tr><td>Тестілеу нәтижесі</td><td>10 тест, барлығы өтті</td></tr>
+</table></section>
+
+<section id="uml"><h2>UML диаграммасы</h2>
+<img src="uml.png" alt="UML класс диаграммасы"></section>
+
+<section id="demo"><h2>Интерактивті демо</h2>
+<p>Пайдаланушыны таңдап, әрекеттерді орындап көріңіз (құпиясөздері: Студент – <code>s123</code>, Оқытушы – <code>t123</code>, Әкімші – <code>a123</code>, Зерттеуші – <code>r123</code>).</p>
+<div class="card">
+<div class="row">
+<select id="u"></select>
+<input id="pw" type="password" placeholder="Құпиясөз">
+<button onclick="doLogin()">Кіру</button>
+<button class="alt" onclick="doLogout()">Шығу</button>
+</div>
+<div class="row">
+<button onclick="doAction()">perform_action()</button>
+<button class="alt" onclick="doNotify()">notify()</button>
+<button class="alt" onclick="doBlock()">Әкімші: бұғаттау</button>
+<button class="alt" onclick="doAll()">Полиморфизм: барлығы</button>
+<button class="alt" onclick="clr()">Тазалау</button>
+</div>
+<div id="log"></div>
+</div></section>
+
+<section id="code"><h2>Программалық код (Python)</h2>
+<details open><summary>edu_platform.py</summary><pre>from abc import ABC, abstractmethod
+
+
+class IAuthenticatable(ABC):
+    &quot;&quot;&quot;Интерфейс: жүйеге кіру / шығу.&quot;&quot;&quot;
+
+    @abstractmethod
+    def login(self, password: str) -&gt; bool: ...
+
+    @abstractmethod
+    def logout(self) -&gt; None: ...
+
+
+class IManageable(ABC):
+    &quot;&quot;&quot;Интерфейс: пайдаланушы деректерін басқару.&quot;&quot;&quot;
+
+    @abstractmethod
+    def update_profile(self, **data) -&gt; None: ...
+
+    @abstractmethod
+    def deactivate(self) -&gt; None: ...
+
+
+class INotifiable(ABC):
+    &quot;&quot;&quot;Интерфейс: хабарландыру қабылдау.&quot;&quot;&quot;
+
+    @abstractmethod
+    def notify(self, message: str) -&gt; str: ...
+
+
+class User(ABC):
+    &quot;&quot;&quot;Абстрактілі класс: барлық пайдаланушыларға ортақ мүмкіндіктер.&quot;&quot;&quot;
+
+    def __init__(self, user_id: int, name: str, email: str, password: str):
+        self.user_id = user_id
+        self.name = name
+        self.email = email
+        self._password = password
+        self.is_active = True
+        self.is_logged_in = False
+
+    @abstractmethod
+    def role(self) -&gt; str:
+        &quot;&quot;&quot;Рөл атауы.&quot;&quot;&quot;
+
+    @abstractmethod
+    def perform_action(self) -&gt; str:
+        &quot;&quot;&quot;Рөлге тән негізгі әрекет (полиморфизм).&quot;&quot;&quot;
+
+    def __str__(self) -&gt; str:
+        return f&quot;[{self.role()}] #{self.user_id} {self.name} &lt;{self.email}&gt;&quot;
+
+
+class _BaseAccount(User, IAuthenticatable, IManageable, INotifiable):
+    &quot;&quot;&quot;Үш интерфейстің ортақ жүзеге асырылуы (қайталанбау үшін).&quot;&quot;&quot;
+
+    def login(self, password: str) -&gt; bool:
+        if self.is_active and password == self._password:
+            self.is_logged_in = True
+        return self.is_logged_in
+
+    def logout(self) -&gt; None:
+        self.is_logged_in = False
+
+    def update_profile(self, **data) -&gt; None:
+        for key in (&quot;name&quot;, &quot;email&quot;):
+            if key in data:
+                setattr(self, key, data[key])
+
+    def deactivate(self) -&gt; None:
+        self.is_active = False
+        self.is_logged_in = False
+
+    def notify(self, message: str) -&gt; str:
+        return f&quot;Хабарлама -&gt; {self.name}: {message}&quot;
+
+
+class Student(_BaseAccount):
+    def __init__(self, user_id, name, email, password, group):
+        super().__init__(user_id, name, email, password)
+        self.group = group
+        self.grades = []
+
+    def role(self): return &quot;Студент&quot;
+
+    def perform_action(self):
+        return f&quot;{self.name} ({self.group}) оқу материалдарын игеруде.&quot;
+
+    def submit_assignment(self, title):
+        return f&quot;{self.name} &#x27;{title}&#x27; тапсырмасын жіберді.&quot;
+
+
+class Teacher(_BaseAccount):
+    def __init__(self, user_id, name, email, password, subject):
+        super().__init__(user_id, name, email, password)
+        self.subject = subject
+
+    def role(self): return &quot;Оқытушы&quot;
+
+    def perform_action(self):
+        return f&quot;{self.name} &#x27;{self.subject}&#x27; пәні бойынша сабақ жүргізуде.&quot;
+
+    def grade(self, student, score):
+        student.grades.append(score)
+        return f&quot;{student.name}: {score} балл қойылды.&quot;
+
+
+class Administrator(_BaseAccount):
+    def __init__(self, user_id, name, email, password):
+        super().__init__(user_id, name, email, password)
+
+    def role(self): return &quot;Әкімші&quot;
+
+    def perform_action(self):
+        return f&quot;{self.name} жүйені басқаруда (аккаунттар, рұқсаттар).&quot;
+
+    def block_user(self, user):
+        user.deactivate()
+        return f&quot;{user.name} аккаунты бұғатталды.&quot;
+
+
+class Researcher(_BaseAccount):
+    &quot;&quot;&quot;Жаңа тип: бұрынғы кодқа тиіспей қосылды (OCP).&quot;&quot;&quot;
+
+    def __init__(self, user_id, name, email, password, topic):
+        super().__init__(user_id, name, email, password)
+        self.topic = topic
+
+    def role(self): return &quot;Зерттеуші&quot;
+
+    def perform_action(self):
+        return f&quot;{self.name} &#x27;{self.topic}&#x27; тақырыбында зерттеу жүргізуде.&quot;
+
+
+class Guest(_BaseAccount):
+    def role(self): return &quot;Қонақ&quot;
+
+    def perform_action(self):
+        return f&quot;{self.name} тек ашық курстарды қарауда.&quot;
+
+    def login(self, password: str) -&gt; bool:  # әрекеті ерекше (override)
+        self.is_logged_in = True
+        return True
+</pre></details>
+<details><summary>main.py (полиморфизм және тестілеу)</summary><pre>from edu_platform import *
+
+def check(n, title, cond):
+    print(f&quot;Тест {n}: {title} -&gt; {&#x27;ӨТТІ&#x27; if cond else &#x27;ҚАТЕ&#x27;}&quot;)
+    assert cond
+
+s = Student(1, &quot;Айжан&quot;, &quot;aizhan@univ.kz&quot;, &quot;s123&quot;, &quot;МАГ-21&quot;)
+t = Teacher(2, &quot;Серік Б.&quot;, &quot;serik@univ.kz&quot;, &quot;t123&quot;, &quot;ООП&quot;)
+a = Administrator(3, &quot;Дана К.&quot;, &quot;dana@univ.kz&quot;, &quot;a123&quot;)
+r = Researcher(4, &quot;Нұрлан Т.&quot;, &quot;nurlan@univ.kz&quot;, &quot;r123&quot;, &quot;Адаптивті оқыту&quot;)
+g = Guest(5, &quot;Қонақ&quot;, &quot;guest@univ.kz&quot;, &quot;&quot;)
+users = [s, t, a, r, g]
+
+print(&quot;=== Полиморфизм: барлық пайдаланушылардың әрекеті ===&quot;)
+for u in users:
+    print(u, &quot;|&quot;, u.perform_action())
+
+print(&quot;\n=== Тестілеу нәтижелері ===&quot;)
+try:
+    User(0, &quot;x&quot;, &quot;x&quot;, &quot;x&quot;); ok = False
+except TypeError:
+    ok = True
+check(1, &quot;абстрактілі User данасын құруға болмайды&quot;, ok)
+check(2, &quot;дұрыс құпиясөзбен кіру&quot;, s.login(&quot;s123&quot;) is True)
+check(3, &quot;қате құпиясөзбен кіруге болмайды&quot;, t.login(&quot;wrong&quot;) is False)
+check(4, &quot;Guest login-ы override жасалған&quot;, g.login(&quot;&quot;) is True)
+check(5, &quot;барлығы 3 интерфейсті жүзеге асырады&quot;,
+      all(isinstance(u, (IAuthenticatable, IManageable, INotifiable)) for u in users))
+check(6, &quot;оқытушы баға қояды&quot;, &quot;85&quot; in t.grade(s, 85) and s.grades == [85])
+s.update_profile(name=&quot;Айжан С.&quot;)
+check(7, &quot;профильді жаңарту&quot;, s.name == &quot;Айжан С.&quot;)
+print(a.block_user(s))
+check(8, &quot;бұғатталған пайдаланушы кіре алмайды&quot;, s.login(&quot;s123&quot;) is False)
+check(9, &quot;хабарландыру&quot;, &quot;Хабарлама&quot; in r.notify(&quot;Жаңа мақала&quot;))
+check(10, &quot;жаңа тип (Researcher) бұрынғы кодты өзгертпей қосылды&quot;,
+      isinstance(r, User) and r.role() == &quot;Зерттеуші&quot;)
+print(&quot;\nБарлық 10 тест сәтті өтті.&quot;)
+</pre></details></section>
+
+<section id="tests"><h2>Тестілеу нәтижелері</h2>
+<pre>=== Полиморфизм: барлық пайдаланушылардың әрекеті ===
+[Студент] #1 Айжан &lt;aizhan@univ.kz&gt; | Айжан (МАГ-21) оқу материалдарын игеруде.
+[Оқытушы] #2 Серік Б. &lt;serik@univ.kz&gt; | Серік Б. &#x27;ООП&#x27; пәні бойынша сабақ жүргізуде.
+[Әкімші] #3 Дана К. &lt;dana@univ.kz&gt; | Дана К. жүйені басқаруда (аккаунттар, рұқсаттар).
+[Зерттеуші] #4 Нұрлан Т. &lt;nurlan@univ.kz&gt; | Нұрлан Т. &#x27;Адаптивті оқыту&#x27; тақырыбында зерттеу жүргізуде.
+[Қонақ] #5 Қонақ &lt;guest@univ.kz&gt; | Қонақ тек ашық курстарды қарауда.
+
+=== Тестілеу нәтижелері ===
+Тест 1: абстрактілі User данасын құруға болмайды -&gt; ӨТТІ
+Тест 2: дұрыс құпиясөзбен кіру -&gt; ӨТТІ
+Тест 3: қате құпиясөзбен кіруге болмайды -&gt; ӨТТІ
+Тест 4: Guest login-ы override жасалған -&gt; ӨТТІ
+Тест 5: барлығы 3 интерфейсті жүзеге асырады -&gt; ӨТТІ
+Тест 6: оқытушы баға қояды -&gt; ӨТТІ
+Тест 7: профильді жаңарту -&gt; ӨТТІ
+Айжан С. аккаунты бұғатталды.
+Тест 8: бұғатталған пайдаланушы кіре алмайды -&gt; ӨТТІ
+Тест 9: хабарландыру -&gt; ӨТТІ
+Тест 10: жаңа тип (Researcher) бұрынғы кодты өзгертпей қосылды -&gt; ӨТТІ
+
+Барлық 10 тест сәтті өтті.
+</pre></section>
+
+<section id="qa"><h2>Зерттеу сұрақтары</h2>
+<div class="card"><b>Неліктен пайдаланушыларды бір абстрактілі класс арқылы модельдеу тиімді?</b><br>Ортақ деректер мен мінез-құлық бір жерде сақталады (DRY). Рөлге тән әдістер абстрактілі болғандықтан, әр туынды класс оларды міндетті түрде жүзеге асырады, ал жүйе бәрімен бір <code>User</code> типі арқылы жұмыс істейді.</div>
+<div class="card"><b>Интерфейстерді қолдану жүйенің кеңейтілуіне қалай әсер етеді?</b><br>Интерфейс «не істеу керек» дегенді ғана анықтайды, «қалай» дегенді класс өзі шешеді. Байланыс әлсірейді, мүмкіндіктерді бөлек дамытуға және бір класқа бірнеше интерфейс қосуға болады (Interface Segregation, Dependency Inversion).</div>
+<div class="card"><b>Жаңа пайдаланушы типін қосқанда бұрынғы кодты өзгерту қажет пе?</b><br>Жоқ. <code>Researcher</code> бұрынғы кластарды өзгертпей қосылды, ал <code>for u in users: u.perform_action()</code> циклі өзгеріссіз жұмыс істейді (Open/Closed принципі).</div>
+<h2>Қорытынды</h2>
+<p>Абстрактілі класс пен үш интерфейс негізінде платформа моделі жасалды; бес класс полиморфизм арқылы бірыңғай басқарылады, 10 тест сәтті өтті. Архитектура жаңа рөлдерді оңай қосуға мүмкіндік береді.</p></section>
+</main>
+<footer>Зертханалық жұмыс № 7 · объектілі-бағдарлы программалау</footer>
+
+<script>
+// JS-көшірмесі: демо үшін (Python-нұсқасымен бірдей логика)
+class User{
+  constructor(id,name,email,pw){if(new.target===User)throw new TypeError("User абстрактілі");
+    Object.assign(this,{id,name,email,_pw:pw,active:true,logged:false});}
+  role(){throw new Error("abstract")}
+  performAction(){throw new Error("abstract")}
+  login(p){if(this.active&&p===this._pw)this.logged=true;return this.logged}
+  logout(){this.logged=false}
+  deactivate(){this.active=false;this.logged=false}
+  notify(m){return `Хабарлама -> ${this.name}: ${m}`}
+}
+class Student extends User{role(){return"Студент"}performAction(){return `${this.name} оқу материалдарын игеруде.`}}
+class Teacher extends User{role(){return"Оқытушы"}performAction(){return `${this.name} 'ООП' пәні бойынша сабақ жүргізуде.`}}
+class Administrator extends User{role(){return"Әкімші"}performAction(){return `${this.name} жүйені басқаруда.`}
+  block(u){u.deactivate();return `${u.name} аккаунты бұғатталды.`}}
+class Researcher extends User{role(){return"Зерттеуші"}performAction(){return `${this.name} зерттеу жүргізуде.`}}
+class Guest extends User{role(){return"Қонақ"}performAction(){return `${this.name} тек ашық курстарды қарауда.`}
+  login(){this.logged=true;return true}}
+const users=[new Student(1,"Айжан","a@u.kz","s123"),new Teacher(2,"Серік Б.","s@u.kz","t123"),
+  new Administrator(3,"Дана К.","d@u.kz","a123"),new Researcher(4,"Нұрлан Т.","n@u.kz","r123"),new Guest(5,"Қонақ","g@u.kz","")];
+const sel=document.getElementById("u"),log=document.getElementById("log");
+users.forEach((u,i)=>sel.add(new Option(`${u.role()} – ${u.name}`,i)));
+const cur=()=>users[sel.value],say=t=>{log.textContent+=t+"\n"};
+function doLogin(){const u=cur();say(u.login(document.getElementById("pw").value)?`✔ ${u.name} жүйеге кірді.`:`✘ Кіру мүмкін емес (қате құпиясөз немесе аккаунт бұғатталған).`)}
+function doLogout(){cur().logout();say(`${cur().name} шықты.`)}
+function doAction(){const u=cur();say(u.logged?`[${u.role()}] ${u.performAction()}`:"Алдымен жүйеге кіріңіз.")}
+function doNotify(){say(cur().notify("Жаңа тапсырма бар"))}
+function doBlock(){const a=users[2];if(!a.logged){say("Әкімші жүйеге кірмеген.");return}
+  if(cur()===a){say("Өзін бұғаттауға болмайды.");return}say(a.block(cur()))}
+function doAll(){users.forEach(u=>say(`[${u.role()}] ${u.performAction()}`))}
+function clr(){log.textContent=""}
+</script>
+</body>
+</html>
